@@ -10,7 +10,7 @@ module SlackRubyBotServer
             params do
               requires :payload, type: JSON do
                 requires :token, type: String
-                requires :callback_id, type: String
+                # requires :callback_id, type: String
                 optional :type, type: String
                 optional :trigger_id, type: String
                 optional :response_url, type: String
@@ -38,9 +38,11 @@ module SlackRubyBotServer
               end
             end
             post '/action' do
+              puts params
+
               action = SlackRubyBotServer::Events::Requests::Action.new(params, request)
               payload_type = params[:payload][:type]
-              callback_id = params[:payload][:callback_id]
+              callback_id = params[:payload][:view][:callback_id]
               SlackRubyBotServer::Events.config.run_callbacks(:action, [payload_type, callback_id].compact, action) || body(false)
             end
           end
